@@ -7,7 +7,7 @@ import ContactForm from './ContactForm'
 //   })
 
 test('ContactForm adds new contact to the list', () => {
-    render(<ContactForm />);
+    const container = render(<ContactForm />);
 
     const firstNameInput = screen.getByLabelText(/first name/i);
     const lastNameInput = screen.getByLabelText(/last name/i);
@@ -23,15 +23,30 @@ test('ContactForm adds new contact to the list', () => {
     const submitButton = screen.getByRole('button', {type: 'submit'});
     fireEvent.click(submitButton);
 
-    const newContact = screen.findByText(/Brad/i);
-    expect(newContact).toBeVisible();
+    const newContact = Document.querySelector('pre')
+    expect(newContact).toBeInTheDocument();
 
 })
 
 
-// test('Can not submit without required fields', () => {
-//     render(<ContactForm />);
+test('Can not submit without required fields', () => {
+    render(<ContactForm />);
 
-//     const submitButton = screen.getByRole('button', {type: 'submit'});
-//     expect(submitButton).toBeTruthy();
-// })
+    const submitButton = screen.getByRole('button', {type: 'submit'});
+    expect(submitButton).toBeEnabled();
+})
+
+
+test('Error messages appear', () => {
+    render(<ContactForm />);
+
+    const firstNameInput = screen.getByLabelText(/first name/i);
+
+    fireEvent.change(firstNameInput, {target: {value: 'ab'} })
+
+    const submitButton = screen.getByRole('button', {type: 'submit'});
+    fireEvent.click(submitButton);
+
+    const error = screen.findByText(/looks like there was an error:/i)
+    expect(error).toHaveTextContent(/looks like there was an error:/i);
+})
